@@ -165,4 +165,8 @@ def handle(client: CogniteClient = None, data=None):
 
         report_ext_pipe(client, "success")
     except Exception as e:
-        report_ext_pipe(client, "fail", e)
+        try:
+            report_ext_pipe(client, "fail", str(e))
+        except Exception as report_error:
+            print(f"Failed to report extraction pipeline failure: {report_error}")
+        raise

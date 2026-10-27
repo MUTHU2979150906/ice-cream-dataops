@@ -2,6 +2,7 @@ from typing import Dict, Union
 
 import orjson
 from requests import Response, Session, adapters
+from urllib3.util.retry import Retry
 
 
 class IceCreamFactoryAPI:
@@ -9,7 +10,13 @@ class IceCreamFactoryAPI:
 
     def __init__(self, base_url: str):
         self.base_url = base_url
-        self.adapter = adapters.HTTPAdapter(max_retries=3)
+        retry = Retry(
+            total=3,
+            backoff_factor=0.5,
+            status_forcelist=(502, 503, 504),
+            allowed_methods=frozenset(["GET"]),
+        )
+        self.adapter = adapters.HTTPAdapter(max_retries=retry)
         self.session = Session()
         self.session.mount("https://", self.adapter)
 
